@@ -1,4 +1,7 @@
-# A sample Gemfile
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-# gem "rails"
+gem 'actionpack'
+gem 'activesupport'
+gem 'active_model_serializers'
+gem 'rspec-rails'
+gem 'pry'
