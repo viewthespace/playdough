@@ -50,4 +50,4 @@ Assuming we have the following ActiveModelSerializer directory structure, we wou
       /v2
         foo_full_serializer.rb
         foo_serializer.rb
-``` 
+```
