@@ -39,7 +39,7 @@ A client on v2 would like a list of `foos` in default form:
 
 `curl -H 'Accept: application/javascript; version=2 http://localhost:3000/foos`
 
-Assuming we have the following ActiveModelSerializer directory structure, we wouldn't have to change the above controller at all:
+Assuming we have the following ActiveModelSerializer directory structure, we wouldn't have to change the above controller at all to fulfill these requests:
 ```
 /app
   serializers
