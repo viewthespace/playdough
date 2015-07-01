@@ -9,7 +9,7 @@ The premise of this gem is that consumers of your API need versioning and differ
 
 
 
-Let's say we have a resource of type `Foo` and `foos_controller.rb` with one `index` action that includes our gem:
+Let's say we have a resource of type `Foo` and `foos_controller.rb` that includes our gem and has an `index` action:
 
 ``` Ruby
 class FoosController< ActionController::Base
@@ -27,8 +27,14 @@ A client on v1 would like a list of `foos` in short form:
 
 `curl -H 'Accept: application/javascript; version=1 shape=short' http://localhost:3000/foos`
 
+A client on v2 would like a list of `foos` in short form:
+
 `curl -H 'Accept: application/javascript; version=2 shape=short' http://localhost:3000/foos`
+
+A client on v1 would like a list of `foos` in full form:
 
 `curl -H 'Accept: application/javascript; version=1 shape=full' http://localhost:3000/foos`
 
-`curl -H 'Accept: application/javascript; version=1 http://localhost:3000/foos`
+A client on v2 would like a list of `foos` in default form:
+
+`curl -H 'Accept: application/javascript; version=2 http://localhost:3000/foos`
