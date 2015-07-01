@@ -42,12 +42,12 @@ A client on v2 would like a list of `foos` in default form:
 Assuming we have the following ActiveModelSerializer directory structure, we wouldn't have to change the above controller at all:
 ```
 /app
-  /serializers
-    /foo
-      /v1
+  serializers
+    foo
+      v1
         foo_short_serializer.rb
         foo_full_serializer.rb
-      /v2
+      v2
         foo_full_serializer.rb
         foo_serializer.rb
 ```
