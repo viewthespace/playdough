@@ -9,7 +9,7 @@ The premise of this gem is that consumers of your API need versioning and differ
 
 
 
-Let's say we have a resource of type `Foo` and `foos_controller.rb` that includes our gem and has an `index` action:
+Let's say we have a resource of type `Foo` and `foos_controller.rb` that includes our gem and has a `show` action:
 
 ``` Ruby
 class FoosController < ActionController::Base
