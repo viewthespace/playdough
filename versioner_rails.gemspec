@@ -29,6 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activesupport'
   spec.add_dependency 'active_model_serializers'
 
-  spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rspec-rails'
 end
