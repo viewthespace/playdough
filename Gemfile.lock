@@ -1,3 +1,11 @@
+PATH
+  remote: .
+  specs:
+    versioner_rails (0.0.1)
+      actionpack
+      active_model_serializers
+      activesupport
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -86,11 +94,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  actionpack
-  active_model_serializers
-  activesupport
   pry
   rspec-rails
+  versioner_rails!
 
 BUNDLED WITH
    1.10.4

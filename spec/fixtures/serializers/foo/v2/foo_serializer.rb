@@ -3,10 +3,10 @@ module Serializers
     module V2
 
       class FooSerializer < ActiveModel::Serializer
-        attributes :version
+        attributes :first_name
 
-        def version
-          'FooSerializer v2'
+        def first_name
+          "#{object.first_name} v2 default"
         end
 
       end

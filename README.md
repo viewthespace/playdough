@@ -17,7 +17,7 @@ class FoosController< ActionController::Base
   versioner Serializers::Foo
 
   def index
-    render json: Foo.all
+    render json: Foo.limit(10), serializer: versioner_serializer
   end
   
 end
@@ -41,7 +41,7 @@ A client on v2 would like a list of `foos` in default form:
 
 Assuming we have the following ActiveModelSerializer directory structure, we wouldn't have to change the above controller at all to fulfill these requests:
 ```
-/app
+app
   serializers
     foo
       v1

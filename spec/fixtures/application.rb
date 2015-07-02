@@ -5,9 +5,7 @@ module Rails
       return @routes if defined?(@routes)
       @routes = ActionDispatch::Routing::RouteSet.new
       @routes.draw do
-        get '/foo', to: 'foos#index'
-        get '/v1/foo', to: 'foos#index'
-        get '/v2/foo', to: 'foos#index'
+        resources :foos, only: [:show, :index]
       end
       @routes
     end
