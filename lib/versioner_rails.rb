@@ -3,7 +3,7 @@ require 'versioner_rails/version'
 module VersionerRails
 
   def versioner mod
-    self.prepend_before_action do
+    self.prepend_before_filter do
       if request.accept
         version = request.accept[/version\s?=\s?(\d+)/, 1].to_i
         shape = request.accept[/shape\s?=\s?(\w+)/, 1]
