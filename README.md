@@ -12,15 +12,14 @@ The premise of this gem is that consumers of your API need versioning and differ
 Let's say we have a resource of type `Foo` and `foos_controller.rb` that includes our gem and has an `index` action:
 
 ``` Ruby
-class FoosController< ActionController::Base
-
+class FoosController < ActionController::Base
   versioner Serializers::Foo
 
-  def index
-    render json: Foo.limit(10), serializer: versioner_serializer
+  def show
+    render json: Foo.new(first_name: 'Shawn'), serializer: versioner_serializer
   end
-  
-end
+
+end  
 ```
 
 A client on v1 would like a list of `foos` in short form:
