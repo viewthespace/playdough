@@ -8,10 +8,10 @@ module VersionerRails
         version = request.accept[/version\s?=\s?(\d+)/, 1]
         shape = request.accept[/shape\s?=\s?(\w+)/, 1]
         mod_version = mod.const_get("V#{version}")
+        resource_name = mod.name.split('::').last
         if shape
-          @versioner_serializer = mod_version.const_get("#{mod.name}#{shape.capitalize}Serializer")
+          @versioner_serializer = mod_version.const_get("#{resource_name}#{shape.capitalize}Serializer")
         else
-          resource_name = mod.name.split('::').last
           @versioner_serializer = mod_version.const_get("#{resource_name}Serializer")
         end
       end
