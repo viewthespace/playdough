@@ -12,7 +12,7 @@ module VersionerRails
           @versioner_serializer = mod_version.const_get("#{mod.name}#{shape.capitalize}Serializer")
         else
           resource_name = mod.name.split('::').last
-          @versioner_serialzier = mod_version.const_get("#{resource_name}Serializer")
+          @versioner_serializer = mod_version.const_get("#{resource_name}Serializer")
         end
       end
     end
