@@ -11,7 +11,8 @@ module VersionerRails
         if shape
           @versioner_serializer = mod_version.const_get("#{mod.name}#{shape.capitalize}Serializer")
         else
-          @versioner_serialzier = mod_version.const_get("#{mod.name}Serializer")
+          resource_name = mod.name.split('::').last
+          @versioner_serialzier = mod_version.const_get("#{resource_name}Serializer")
         end
       end
     end
