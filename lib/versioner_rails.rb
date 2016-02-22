@@ -2,8 +2,9 @@ require 'versioner_rails/version'
 
 module VersionerRails
 
-  def versioner mod
-    self.prepend_before_filter do
+  def versioner mod, **opts
+    normalize_options(opts)
+    self.prepend_before_filter opts do
       if request.accept
         version = request.accept[/version\s?=\s?(\d+)/, 1]
         shape = request.accept[/shape\s?=\s?(\w+)/, 1]
@@ -15,6 +16,14 @@ module VersionerRails
           @versioner_serializer = mod_version.const_get("#{resource_name}Serializer")
         end
       end
+    end
+  end
+
+  private
+
+  def normalize_options(opts)
+    opts.keep_if do |k, _v|
+      [:except, :only].include?(k)
     end
   end
 
