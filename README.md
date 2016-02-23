@@ -19,7 +19,7 @@ class FoosController < ActionController::Base
     render json: Foo.new(first_name: 'Shawn'), serializer: versioner_serializer
   end
 
-end  
+end
 ```
 
 A client on v1 would like a list of `foos` in short form:
@@ -49,4 +49,10 @@ app
       v2
         foo_full_serializer.rb
         foo_serializer.rb
+```
+
+To specify that the versioner should be applied to or excluded from given controller actions, use the :only and :except parameters.
+```
+versioner Serializers::Foo, :except => [:index, :show]
+versioner Serializers::Foo, :only => :delete
 ```
