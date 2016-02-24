@@ -33,6 +33,12 @@ describe FoosController, type: :controller do
       expect(JSON.parse(response.body)['first_name']).to eq('Shawn')
     end
 
-  end  
-  
+    it 'uses the v1 foo bar baz serializer' do
+      request.env['HTTP_ACCEPT'] = 'application/json; version=1 shape=bar_baz'
+      get :show, id: 1
+      expect(JSON.parse(response.body)['foo_bar_baz']['first_name']).to eq('Shawn v1 bar baz')
+    end
+
+  end
+
 end
