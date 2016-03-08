@@ -1,4 +1,3 @@
-require 'pry'
 require 'active_support/all'
 require 'action_controller'
 require 'action_dispatch'
