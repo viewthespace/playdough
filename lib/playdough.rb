@@ -1,6 +1,6 @@
-require 'versioner_rails/version'
+require 'playdough/version'
 
-module VersionerRails
+module Playdough
 
   def versioner mod, **opts
     normalize_options(opts)
@@ -32,6 +32,6 @@ end
 if defined? ActionController::Base
   ActionController::Base.class_eval do
     attr_accessor :versioner_serializer
-    extend VersionerRails
+    extend Playdough
   end
 end
