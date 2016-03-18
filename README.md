@@ -1,4 +1,4 @@
-# versioner-rails
+# Playdough
 
 API versioning that promotes convention over configuration.
 
@@ -56,3 +56,4 @@ To specify that the versioner should be applied to or excluded from given contro
 versioner Serializers::Foo, :except => [:index, :show]
 versioner Serializers::Foo, :only => :delete
 ```
+
