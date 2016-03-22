@@ -22,8 +22,7 @@ module Shapeable
         begin
           serializer = path.const_get("V#{version}").const_get("#{resource}#{shape.camelize}Serializer")
         rescue NameError
-          # raise InvalidShapeError.new(version, shape)
-          raise InvalidShapeError, 'invalid'
+          raise InvalidShapeError, 'invalid shape'
         end
       end
       serializer
