@@ -4,11 +4,11 @@ class FoosController < ActionController::Base
   acts_as_shapeable(path: Serializers::Foo)
 
   def show
-    render json: Foo.new(first_name: 'Shawn'), serializer: shape(default_version: 1, default_shape: 'foo')
+    render json: Foo.new(first_name: 'Shawn'), serializer: shape(default_version: 1, default_shape: 'default')
   end
 
   def index
-    render json: [Foo.new], each_serializer: shape(default_version: 1, default_shape: 'short')
+    render json: [Foo.new], each_serializer: shape(default_version: 1, default_shape: 'default')
   end
 
 end

@@ -20,16 +20,15 @@ module Shapeable
         version = request.accept[/version\s?=\s?(\d+)/, 1].to_i.presence || default_version
         shape = request.accept[/shape\s?=\s?(\w+)/, 1] || default_shape
         begin
-          serializer = path.const_get("V#{version}").const_get("#{shape.camelize}Serializer")
+          serializer = path.const_get("V#{version}").const_get("#{resource}#{shape.camelize}Serializer")
         rescue NameError
           # raise InvalidShapeError.new(version, shape)
           raise InvalidShapeError, 'invalid'
         end
       end
+      serializer
     end
   end
-
-  # raise ArgumentError, "configure requires a block or the existance of a #{CONFIG_FILE} in your project"
 
   private
 
