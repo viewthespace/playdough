@@ -2,36 +2,49 @@ require 'shapeable/version'
 
 module Shapeable
 
-  def versioner mod, **opts
+  def acts_as_shapeable(**opts)
+
     normalize_options(opts)
-    self.prepend_before_filter opts do
+    acts_as_shapeable_opts = opts || {}
+
+    define_method(:shape) do |opts|
+      opts = acts_as_shapeable_opts.merge(opts)
+      default_shape = opts[:default_shape]
+      default_version = opts[:default_version]
+      path = opts[:path]
+      raise ArgumentError, "specify a default shape" unless default_shape
+      raise ArgumentError, "specify a default version" unless default_version
+      raise ArgumentError, "specify a path" unless path
+      resource = path.name.split('::').last.constantize
       if request.accept
-        version = request.accept[/version\s?=\s?(\d+)/, 1]
-        shape = request.accept[/shape\s?=\s?(\w+)/, 1]
-        mod_version = mod.const_get("V#{version}")
-        resource_name = mod.name.split('::').last
-        if shape
-          @versioner_serializer = mod_version.const_get("#{resource_name}#{shape.camelize}Serializer")
-        else
-          @versioner_serializer = mod_version.const_get("#{resource_name}Serializer")
+        version = request.accept[/version\s?=\s?(\d+)/, 1].to_i.presence || default_version
+        shape = request.accept[/shape\s?=\s?(\w+)/, 1] || default_shape
+        begin
+          serializer = path.const_get("V#{version}").const_get("#{shape.camelize}Serializer")
+        rescue NameError
+          # raise InvalidShapeError.new(version, shape)
+          raise InvalidShapeError, 'invalid'
         end
       end
     end
   end
 
+  # raise ArgumentError, "configure requires a block or the existance of a #{CONFIG_FILE} in your project"
+
   private
 
   def normalize_options(opts)
     opts.keep_if do |k, _v|
-      [:except, :only].include?(k)
+      [:path, :default_shape, :default_version].include?(k)
     end
   end
+
+  class InvalidShapeError < NameError; end
 
 end
 
 if defined? ActionController::Base
   ActionController::Base.class_eval do
-    attr_accessor :versioner_serializer
     extend Shapeable
   end
 end
