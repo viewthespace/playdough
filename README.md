@@ -1,4 +1,4 @@
-# Playdough
+# Shapeable
 
 API versioning that promotes convention over configuration.
 
