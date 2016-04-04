@@ -8,15 +8,14 @@ The premise of this gem is that consumers of your API need versioning and differ
 ## example
 
 
-
 Let's say we have a resource of type `Foo` and `foos_controller.rb` that includes our gem and has a `show` action:
 
 ``` Ruby
 class FoosController < ActionController::Base
-  versioner Serializers::Foo
+  acts_as_shapeable(path: Serializers::Foo)
 
   def show
-    render json: Foo.new(first_name: 'Shawn'), serializer: versioner_serializer
+    render json: Foo.new(first_name: 'Shawn'), serializer: shape(default_version: 1, default_shape: 'short')
   end
 
 end
@@ -34,11 +33,12 @@ A client on v1 would like a list of `foos` in full form:
 
 `curl http://localhost:3000/foos -H 'Accept: application/javascript; version=1 shape=full'`
 
-A client on v2 would like a list of `foos` in default form:
+A client on v2 would like a list of `foos` in default form, in this case short:
 
-`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=2`
+`curl http://localhost:3000/foos -H 'Accept: application/javascript;`
 
 Assuming we have the following ActiveModelSerializer directory structure, we wouldn't have to change the above controller at all to fulfill these requests:
+
 ```
 app
   serializers
@@ -51,9 +51,13 @@ app
         foo_serializer.rb
 ```
 
-To specify that the versioner should be applied to or excluded from given controller actions, use the :only and :except parameters.
-```
-versioner Serializers::Foo, :except => [:index, :show]
-versioner Serializers::Foo, :only => :delete
-```
 
+The `shape` method returns the serializer constant.
+
+Both `acts_as_shapeable` and `shape` except the following arguments:
+
+* `path`: The top level module where the serializers are defined
+* `default_version`: The default version in cases where the header is not specified
+* `default_shape`: The deafault shape in cases where the shape is not specified
+
+All three options must be defined either on `acts_as_shapeable` or `shape`. The options defined on `shape` have greater precedence than those on `acts_as_shapeable`.

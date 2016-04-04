@@ -7,7 +7,8 @@ describe FoosController, type: :controller do
     it 'uses the v1 default serializer' do
       request.env['HTTP_ACCEPT'] = 'application/json; version=1'
       get :show, id: 1
-      expect(JSON.parse(response.body)['foo']['first_name']).to eq('Shawn v1 default')
+      puts response.body
+      expect(JSON.parse(response.body)['foo_default']['first_name']).to eq('Shawn v1 default')
     end
 
     it 'uses the v1 foo full serializer' do
@@ -19,7 +20,7 @@ describe FoosController, type: :controller do
     it 'uses the v2 default serializer' do
       request.env['HTTP_ACCEPT'] = 'application/json; version=2'
       get :show, id: 1
-      expect(JSON.parse(response.body)['foo']['first_name']).to eq('Shawn v2 default')
+      expect(JSON.parse(response.body)['foo_default']['first_name']).to eq('Shawn v2 default')
     end
 
     it 'uses the v2 foo full serializer' do

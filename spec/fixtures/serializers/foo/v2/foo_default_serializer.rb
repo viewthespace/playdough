@@ -2,7 +2,7 @@ module Serializers
   module Foo
     module V2
 
-      class FooSerializer < ActiveModel::Serializer
+      class FooDefaultSerializer < ActiveModel::Serializer
         attributes :first_name
 
         def first_name
