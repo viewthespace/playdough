@@ -54,7 +54,7 @@ app
 
 The `shape` method returns the serializer constant.
 
-Both `acts_as_shapeable` and `shape` except the following arguments:
+Both `acts_as_shapeable` and `shape` accept the following arguments:
 
 * `path`: The top level module where the serializers are defined
 * `default_version`: The default version in cases where the header is not specified
