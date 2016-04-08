@@ -56,8 +56,8 @@ The `shape` method returns the serializer constant.
 
 Both `acts_as_shapeable` and `shape` accept the following arguments:
 
-* `path`: The top level module where the serializers are defined
-* `default_version`: The default version in cases where the header is not specified
-* `default_shape`: The deafault shape in cases where the shape is not specified
+* `path`: The top level module where the serializers are defined (required).
+* `default_version`: The default version in cases where the header is not specified.
+* `default_shape`: The deafault shape in cases where the shape is not specified.
 
-All three options must be defined either on `acts_as_shapeable` or `shape`. The options defined on `shape` have greater precedence than those on `acts_as_shapeable`.
+All three options can be defined either on `acts_as_shapeable` or `shape`. The options defined on `shape` have greater precedence than those on `acts_as_shapeable`.
