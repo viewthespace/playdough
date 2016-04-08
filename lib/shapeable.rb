@@ -7,19 +7,18 @@ module Shapeable
     normalize_shapeable_options(opts)
     acts_as_shapeable_opts = opts || {}
 
-    define_method(:shape) do |opts|
+    define_method(:shape) do |opts={}|
       opts = acts_as_shapeable_opts.merge(opts)
       default_shape = opts[:default_shape]
       default_version = opts[:default_version]
       path = opts[:path]
-      raise ArgumentError, "specify a default shape" unless default_shape
-      raise ArgumentError, "specify a default version" unless default_version
-      raise ArgumentError, "specify a path" unless path
+      raise ArgumentError, "Specify a path" unless path
       resource = path.name.split('::').last.constantize
       if request.accept
         version_str = request.accept[/version\s?=\s?(\d+)/, 1]
         version = version_str.nil? ? default_version : version_str.to_i
         shape = request.accept[/shape\s?=\s?(\w+)/, 1] || default_shape
+        raise UnresolvedShapeError, "Unable to resolve shape. Try specifying a default version and shape" unless version && shape
         begin
           serializer = path.const_get("V#{version}").const_get("#{resource}#{shape.camelize}Serializer")
         rescue NameError
@@ -39,6 +38,7 @@ module Shapeable
   end
 
   class InvalidShapeError < NameError; end
+  class UnresolvedShapeError < Exception; end
 
 end
 
