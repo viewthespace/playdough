@@ -6,6 +6,7 @@ module Rails
       @routes = ActionDispatch::Routing::RouteSet.new
       @routes.draw do
         resources :foos, only: [:show, :index]
+        resources :bars, only: [:show]
       end
       @routes
     end
