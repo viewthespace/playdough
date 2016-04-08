@@ -17,12 +17,13 @@ module Shapeable
       raise ArgumentError, "specify a path" unless path
       resource = path.name.split('::').last.constantize
       if request.accept
-        version = request.accept[/version\s?=\s?(\d+)/, 1].to_i.presence || default_version
+        version_str = request.accept[/version\s?=\s?(\d+)/, 1]
+        version = version_str.nil? ? default_version : version_str.to_i
         shape = request.accept[/shape\s?=\s?(\w+)/, 1] || default_shape
         begin
           serializer = path.const_get("V#{version}").const_get("#{resource}#{shape.camelize}Serializer")
         rescue NameError
-          raise InvalidShapeError, 'invalid shape'
+          raise InvalidShapeError, "Invalid shape. Tried to find version #{version} with shape #{shape}"
         end
       end
       serializer
