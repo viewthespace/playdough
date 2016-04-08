@@ -4,7 +4,7 @@ module Shapeable
 
   def acts_as_shapeable(**opts)
 
-    normalize_options(opts)
+    normalize_shapeable_options(opts)
     acts_as_shapeable_opts = opts || {}
 
     define_method(:shape) do |opts|
@@ -32,7 +32,7 @@ module Shapeable
 
   private
 
-  def normalize_options(opts)
+  def normalize_shapeable_options(opts)
     opts.keep_if do |k, _v|
       [:path, :default_shape, :default_version].include?(k)
     end
