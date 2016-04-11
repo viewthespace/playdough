@@ -1,49 +1,35 @@
 require 'shapeable/version'
+require 'shapeable/configuration'
+require 'shapeable/controller_methods'
 
 module Shapeable
+  CONFIG_FILE = './config/shapeable.rb'
 
-  def acts_as_shapeable(**opts)
+  class << self
+    attr_accessor :configuration_data
 
-    normalize_shapeable_options(opts)
-    acts_as_shapeable_opts = opts || {}
-
-    define_method(:shape) do |opts={}|
-      opts = acts_as_shapeable_opts.merge(opts)
-      default_shape = opts[:default_shape]
-      default_version = opts[:default_version]
-      path = opts[:path]
-      raise ArgumentError, "Specify a path" unless path
-      resource = path.name.split('::').last.constantize
-      if request.accept
-        version_str = request.accept[/version\s?=\s?(\d+)/, 1]
-        version = version_str.nil? ? default_version : version_str.to_i
-        shape = request.accept[/shape\s?=\s?(\w+)/, 1] || default_shape
-        raise UnresolvedShapeError, "Unable to resolve shape. Try specifying a default version and shape" unless version && shape
-        begin
-          serializer = path.const_get("V#{version}").const_get("#{resource}#{shape.camelize}Serializer")
-        rescue NameError
-          raise InvalidShapeError, "Invalid shape. Tried to find version #{version} with shape #{shape}"
+    def configure(file = nil)
+      configuration
+      if block_given?
+        yield(configuration)
+      else
+        if File.exists?(CONFIG_FILE)
+          file ||= CONFIG_FILE
+          require file
+        else
+          raise ArgumentError, "Configure requires a block or the existance of a #{CONFIG_FILE} in your project"
         end
       end
-      serializer
+    end
+
+    def configuration
+      self.configuration_data ||= Shapeable::Configuration.new
     end
   end
-
-  private
-
-  def normalize_shapeable_options(opts)
-    opts.keep_if do |k, _v|
-      [:path, :default_shape, :default_version].include?(k)
-    end
-  end
-
-  class InvalidShapeError < NameError; end
-  class UnresolvedShapeError < Exception; end
-
 end
 
 if defined? ActionController::Base
   ActionController::Base.class_eval do
-    extend Shapeable
+    extend Shapeable::ControllerMethods
   end
 end

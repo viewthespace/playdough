@@ -9,6 +9,7 @@ Dir[Dir.pwd + '/spec/fixtures/*.rb'].each { |f| require f }
 Dir[Dir.pwd + '/spec/fixtures/models/**/*.rb'].each { |f| require f }
 Dir[Dir.pwd + '/spec/fixtures/serializers/**/*.rb'].each { |f| require f }
 Dir[Dir.pwd + '/spec/fixtures/controllers/**/*.rb'].each { |f| require f }
+Dir[Dir.pwd + '/spec/fixtures/config/**/*.rb'].each { |f| require f }
 
 require 'rspec/rails'
 
