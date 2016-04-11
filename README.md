@@ -61,3 +61,19 @@ Both `acts_as_shapeable` and `shape` accept the following arguments:
 * `default_shape`: The deafault shape in cases where the shape is not specified.
 
 All three options can be defined either on `acts_as_shapeable` or `shape`. The options defined on `shape` have greater precedence than those on `acts_as_shapeable`.
+
+
+## Configuration
+
+Shapeable can be configured with a globabl configuration file. All options which can be passed to `acts_as_shapeable` and `shape` can also be configured using this method. Configuration options inside the config file have the lowest precedence.
+
+You can configure shapeable by passing in all configuration options(`default_version`, `default_shape`, and `path`), to `Shapeable.configure` in block format. One approach is to put this in a config file that lives at `config/shapeable.rb`.
+
+```Ruby
+# config/shapeable.rb
+Shapeable.configure do |config|
+  config.default_version = 1
+  config.default_shape = 'default'
+  config.path = Serializers::Bar
+end
+```

@@ -6,4 +6,8 @@ class BarsController < ActionController::Base
   def show
     render json: Bar.new(first_name: 'Shawn'), serializer: shape
   end
+
+  def index
+    render json: Bar.new(first_name: 'Shawn'), serializer: shape
+  end
 end

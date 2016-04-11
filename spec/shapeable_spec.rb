@@ -7,7 +7,6 @@ describe FoosController, type: :controller do
     it 'uses the v1 default serializer' do
       request.env['HTTP_ACCEPT'] = 'application/json;'
       get :show, id: 1
-      puts response.body
       expect(JSON.parse(response.body)['foo_default']['first_name']).to eq('Shawn v1 default')
     end
 
