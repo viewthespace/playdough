@@ -3,4 +3,3 @@ Shapeable.configure do |config|
   config.default_shape = 'default'
   config.path = Serializers::Bar
 end
-
