@@ -8,8 +8,6 @@ class BarsController < ActionController::Base
   end
 
   def index
-    puts shape
     render json: Bar.new(first_name: 'Shawn'), serializer: shape
-    puts 'cow'
   end
 end
