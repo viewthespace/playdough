@@ -5,6 +5,13 @@ describe FoosController, type: :controller do
 
   describe '#show' do
 
+    before do
+      Shapeable.configuration.default_version = 1
+      Shapeable.configuration.default_shape = 'default'
+      Shapeable.configuration.path = Serializers::Bar
+    end
+
+
     it 'uses the v1 default serializer' do
       request.env['HTTP_ACCEPT'] = 'application/json;'
       get :show, id: 1
