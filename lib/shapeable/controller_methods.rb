@@ -14,14 +14,12 @@ module Shapeable
       acts_as_shapeable_opts || {}
       define_shapeable_helpers
       define_method(:shape) do |shape_opts = {}|
+        return unless request.accept
         opts = merge_shapeable_options(
-          Shapeable.configuration.as_json,
-          acts_as_shapeable_opts,
-          shape_opts
+          Shapeable.configuration.as_json, acts_as_shapeable_opts, shape_opts
         )
         normalize_shapeable_options(opts)
         raise ArgumentError, 'Specify a path' unless opts[:path]
-        return unless request.accept
         version = resolve_version(request.accept, opts[:default_version])
         shape = resolve_shape(request.accept, opts[:default_shape])
         raise Shapeable::Errors::UnresolvedShapeError unless version && shape
