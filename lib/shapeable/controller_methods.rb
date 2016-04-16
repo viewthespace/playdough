@@ -23,11 +23,11 @@ module Shapeable
         shape = resolve_shape(request.accept, opts[:default_shape])
         if opts[:enforce_versioning]
           version = resolve_version(request.accept, opts[:default_version])
-          raise Shapeable::Errors::UnresolvedShapeError unless version && shape
-          constant = construct_constant(opts[:path], shape, version: version)
+          raise Shapeable::Errors::UnresolvedShapeError unless version && shape if opts[:enforce_shape]
+          constant = construct_constant(opts[:path], shape: shape, version: version)
         else
-          raise Shapeable::Errors::UnresolvedShapeError unless shape
-          constant = construct_constant(opts[:path], shape)
+          raise Shapeable::Errors::UnresolvedShapeError unless shape if opts[:enforce_shape]
+          constant = construct_constant(opts[:path], shape: shape)
         end
         constant
       end
@@ -44,7 +44,7 @@ module Shapeable
 
     def normalize_shapeable_options(opts)
       opts.keep_if do |k, _v|
-        [:path, :default_shape, :default_version, :enforce_versioning].include?(k)
+        [:path, :default_shape, :default_version, :enforce_versioning, :enforce_shape].include?(k)
       end
     end
 
@@ -63,11 +63,16 @@ module Shapeable
       accept_header[/shape\s?=\s?(\w+)/, 1] || default
     end
 
-    def construct_constant(path, shape, version: nil)
+    def construct_constant(path, shape: nil, version: nil)
       resource = infer_resource_name(path)
-      return path.const_get("#{resource}#{shape.camelize}Serializer") unless version
-      path_with_version = path.const_get("V#{version}")
-      path_with_version.const_get("#{resource}#{shape.camelize}Serializer")
+      if shape
+        return path.const_get("#{resource}#{shape.camelize}Serializer") unless version
+        path_with_version = path.const_get("V#{version}")
+        return path_with_version.const_get("#{resource}#{shape.camelize}Serializer")
+      else
+        return path.const_get("#{resource}Serializer") unless version
+        return path_with_version.const_get("#{resource}Serializer")
+      end
     rescue NameError
       raise Shapeable::Errors::InvalidShapeError.new(path, shape, version: version)
     end

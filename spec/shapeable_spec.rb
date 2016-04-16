@@ -42,18 +42,25 @@ describe FoosController, type: :controller do
 
   end
 
-  describe '#show without versioning enforced' do
+  describe '#show without versioning or shape enforced' do
 
     before do
       Shapeable.configuration_data.enforce_versioning = false
+      Shapeable.configuration_data.enforce_shape = false
+      Shapeable.configuration_data.default_shape = nil
     end
 
     it 'uses the foo full serializer' do
-      request.env['HTTP_ACCEPT'] = 'application/json; version=1 shape=full'
+      request.env['HTTP_ACCEPT'] = 'application/json; shape=full'
       get :show, id: 1
       expect(JSON.parse(response.body)['foo_full']['first_name']).to eq('Shawn full')
     end
 
+    it 'uses the foo full serializer' do
+      request.env['HTTP_ACCEPT'] = 'application/json;'
+      get :show, id: 1
+      expect(JSON.parse(response.body)['foo']['first_name']).to eq('Shawn')
+    end
 
   end
 

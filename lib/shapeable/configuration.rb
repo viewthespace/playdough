@@ -8,7 +8,7 @@ module Shapeable
       @default_version = nil
       @default_shape = nil
       @enforce_versioning = true
-      @enfore_shape = true
+      @enforce_shape = true
     end
 
     def as_json
