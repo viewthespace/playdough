@@ -20,10 +20,16 @@ module Shapeable
         )
         normalize_shapeable_options(opts)
         raise ArgumentError, 'Specify a path' unless opts[:path]
-        version = resolve_version(request.accept, opts[:default_version])
         shape = resolve_shape(request.accept, opts[:default_shape])
-        raise Shapeable::Errors::UnresolvedShapeError unless version && shape
-        construct_constant(opts[:path], version, shape)
+        if opts[:enforce_versioning]
+          version = resolve_version(request.accept, opts[:default_version])
+          raise Shapeable::Errors::UnresolvedShapeError unless version && shape
+          constant = construct_constant(opts[:path], shape, version: version)
+        else
+          raise Shapeable::Errors::UnresolvedShapeError unless shape
+          constant = construct_constant(opts[:path], shape)
+        end
+        constant
       end
     end
 
@@ -38,7 +44,7 @@ module Shapeable
 
     def normalize_shapeable_options(opts)
       opts.keep_if do |k, _v|
-        [:path, :default_shape, :default_version].include?(k)
+        [:path, :default_shape, :default_version, :enforce_versioning].include?(k)
       end
     end
 
@@ -57,12 +63,13 @@ module Shapeable
       accept_header[/shape\s?=\s?(\w+)/, 1] || default
     end
 
-    def construct_constant(path, version, shape)
+    def construct_constant(path, shape, version: nil)
       resource = infer_resource_name(path)
+      return path.const_get("#{resource}#{shape.camelize}Serializer") unless version
       path_with_version = path.const_get("V#{version}")
       path_with_version.const_get("#{resource}#{shape.camelize}Serializer")
     rescue NameError
-      raise Shapeable::Errors::InvalidShapeError.new(path, version, shape)
+      raise Shapeable::Errors::InvalidShapeError.new(path, shape, version: version)
     end
 
     def infer_resource_name(path)
