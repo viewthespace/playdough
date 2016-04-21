@@ -5,7 +5,7 @@ API versioning that promotes convention over configuration.
 The premise of this gem is that consumers of your API need versioning and different shapes of your resources. Without proper thought into versioning and shaping, your codebase can quickly resolve into a redundant and confusing state. This gem tries to solve that problem by allowing the API owner to use simple conventions -- Accept headers and ActiveModelSerializer namespacing -- to achieve controller reuse by controllers delegating resource versioning and shaping to the serializer level.
 
 
-## example
+## Example
 
 
 Let's say we have a resource of type `Foo` and `foos_controller.rb` that includes our gem and has a `show` action:
@@ -21,23 +21,7 @@ class FoosController < ActionController::Base
 end
 ```
 
-A client on v1 would like a list of `foos` in short form:
-
-`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=1 shape=short'`
-
-A client on v2 would like a list of `foos` in short form:
-
-`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=2 shape=short'`
-
-A client on v1 would like a list of `foos` in full form:
-
-`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=1 shape=full'`
-
-A client on v2 would like a list of `foos` in default form, in this case short:
-
-`curl http://localhost:3000/foos -H 'Accept: application/javascript;`
-
-Assuming we have the following ActiveModelSerializer directory structure, we wouldn't have to change the above controller at all to fulfill these requests:
+Assume we have the following `ActiveModelSerializer` directory structure:
 
 ```
 app
@@ -51,21 +35,45 @@ app
         foo_serializer.rb
 ```
 
+Inside our controller we can reference the `shape` method, which returns the serializer constant. The top level module path in which the serializer can be found must be specified using the `path` option on either the `acts_as_shapeable`, or the `shape` method. In this case it would be `Serializers::Foo`. If the path is not specified either in `acts_as_shapeable` or `shape`, then calling `shape` will raise an `ArgumentError`.
 
-The `shape` method returns the serializer constant.
+Now say we have several clients, each expecting a different serialized response.
+
+A client on v1 would like a list of `foos` in short form:
+`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=1 shape=short'`
+
+When we reference `shape` inside the controller, it returns the following constant: `Serializers::Foo::V1::FooShortSerializer`
+
+
+A client on v2 would like a list of `foos` in short form:
+`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=2 shape=short'`
+
+When we reference `shape` inside the controller, it returns the following constant: `Serializers::Foo::V2::FooShortSerializer`
+
+
+A client on v1 would like a list of `foos` in full form:
+`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=1 shape=full'`
+
+When we reference `shape` inside the controller, it returns the following constant: `Serializers::Foo::V1::FooFullSerializer`
+
+
+## Configuring Defaults
 
 Both `acts_as_shapeable` and `shape` accept the following arguments:
 
-* `path`: The top level module where the serializers are defined (required).
 * `default_version`: The default version in cases where the header is not specified.
 * `default_shape`: The deafault shape in cases where the shape is not specified.
 
-All three options can be defined either on `acts_as_shapeable` or `shape`. The options defined on `shape` have greater precedence than those on `acts_as_shapeable`.
+The options defined on `shape` have greater precedence over those defined on `acts_as_shapeable`.
+
+In cases where the version and/or the shape is not specified in the Accept Header Shapeable will instead use the provided defaults. If no default is provided, and nothing is specified in the header, Shapeable will raise an `UnresolvedShapeError`.
+
+Using the same example controller and directory structure from above, a client sends no headers:
+`curl http://localhost:3000/foos -H 'Accept: application/javascript;`
+Shapeable uses the defaults provided, and resolves `shape` to the following constant: `Serializers::Foo::V1::FooShortSerializer`
 
 
-## Configuration
-
-Shapeable can be configured with a globabl configuration file. All options which can be passed to `acts_as_shapeable` and `shape` can also be configured using this method. Configuration options inside the config file have the lowest precedence.
+Shapeable can also be configured with a global configuration file. All options which can be passed to `acts_as_shapeable` and `shape` can also be configured using this method. Configuration options inside the config file have the lowest precedence.
 
 You can configure shapeable by passing in all configuration options(`default_version`, `default_shape`, and `path`), to `Shapeable.configure` in block format. One approach is to put this in a config file that lives at `config/shapeable.rb`.
 
@@ -77,3 +85,9 @@ Shapeable.configure do |config|
   config.path = Serializers::Bar
 end
 ```
+
+
+## Gotchas
+
+* Shapeable infers the resource name from the path. Specifically it expects that the last constant in the path is the resource. So in the case of `acts_as_shapeable(path: Serializers::Foo)` Shapeable assumes that the resource is `Foo`.
+* If we want a shape of `FooSerializer` we must specify a default_shape of `''` (empty string).
