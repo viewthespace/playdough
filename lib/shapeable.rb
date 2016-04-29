@@ -1,6 +1,6 @@
 require 'shapeable/version'
 require 'shapeable/configuration'
-require 'shapeable/controller_methods'
+require 'shapeable/shape'
 require 'shapeable/errors'
 require 'shapeable/extenders'
 

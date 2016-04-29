@@ -1,6 +1,6 @@
 require_relative 'errors'
 module Shapeable
-  module ControllerMethods
+  module Shape
 
     def self.included base
       base.class_eval do
