@@ -86,6 +86,23 @@ Shapeable.configure do |config|
 end
 ```
 
+## Enforce Versioning and Shaping
+
+There are a few additional options which allow you to decide whether you want to enforce version or shape.
+
+`enforce_versioning`, and `enforce_shape` can be passed to `Shapeable.configure`. By default both are set to true.
+
+When `enforce_versioning` is set to false, version will be ignored, and the version module will not be prepended. So the following request
+
+`curl http://localhost:3000/foos -H 'Accept: application/javascript; shape=default'`
+
+Will be constructed as `Serializers::Foo::FooDefaultSerializer` without the version module prepended.
+
+When `enforce_shape` is set to false, shape will be optional. When shape is not specified, the constant will be constructed with no shape. So the following request:
+
+`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=1'`
+
+Will be constructed as `Serializers::Foo::V1::FooSerializer`.
 
 ## Gotchas
 

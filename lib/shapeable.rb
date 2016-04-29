@@ -1,6 +1,8 @@
 require 'shapeable/version'
 require 'shapeable/configuration'
-require 'shapeable/controller_methods'
+require 'shapeable/shape'
+require 'shapeable/errors'
+require 'shapeable/extenders'
 
 module Shapeable
   CONFIG_FILE = './config/shapeable.rb'
@@ -30,6 +32,6 @@ end
 
 if defined? ActionController::Base
   ActionController::Base.class_eval do
-    extend Shapeable::ControllerMethods
+    extend Shapeable::Extenders
   end
 end
