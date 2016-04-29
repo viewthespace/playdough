@@ -11,7 +11,6 @@ describe FoosController, type: :controller do
       Shapeable.configuration.path = Serializers::Bar
     end
 
-
     it 'uses the v1 default serializer' do
       request.env['HTTP_ACCEPT'] = 'application/json;'
       get :show, id: 1

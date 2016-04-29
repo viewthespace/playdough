@@ -1,44 +1,27 @@
 require_relative 'errors'
 module Shapeable
   module ControllerMethods
-    SHAPEABLE_HELPER_METHODS = [
-      :merge_shapeable_options,
-      :normalize_shapeable_options,
-      :resolve_version,
-      :resolve_shape,
-      :infer_resource_name,
-      :construct_constant
-    ].freeze
 
-    def acts_as_shapeable(**acts_as_shapeable_opts)
-      acts_as_shapeable_opts || {}
-      define_shapeable_helpers
-      define_method(:shape) do |shape_opts = {}|
-        return unless request.accept
-        opts = merge_shapeable_options(
-          Shapeable.configuration.as_json, acts_as_shapeable_opts, shape_opts
-        )
-        normalize_shapeable_options(opts)
-        raise ArgumentError, 'Specify a path' unless opts[:path]
-        shape = resolve_shape(request.accept, opts[:default_shape])
-        if opts[:enforce_versioning]
-          version = resolve_version(request.accept, opts[:default_version])
-          raise Shapeable::Errors::UnresolvedShapeError unless version && shape if opts[:enforce_shape]
-          constant = construct_constant(opts[:path], shape: shape, version: version)
-        else
-          raise Shapeable::Errors::UnresolvedShapeError unless shape if opts[:enforce_shape]
-          constant = construct_constant(opts[:path], shape: shape)
+    def self.included base
+      base.class_eval do
+        def shape(shape_opts = {})
+          return unless request.accept
+          opts = merge_shapeable_options(
+            Shapeable.configuration.as_json, acts_as_shapeable_opts, shape_opts
+          )
+          normalize_shapeable_options(opts)
+          raise ArgumentError, 'Specify a path' unless opts[:path]
+          shape = resolve_shape(request.accept, opts[:default_shape])
+          if opts[:enforce_versioning]
+            version = resolve_version(request.accept, opts[:default_version])
+            raise Shapeable::Errors::UnresolvedShapeError unless version && shape if opts[:enforce_shape]
+            constant = construct_constant(opts[:path], shape: shape, version: version)
+          else
+            raise Shapeable::Errors::UnresolvedShapeError unless shape if opts[:enforce_shape]
+            constant = construct_constant(opts[:path], shape: shape)
+          end
+          constant
         end
-        constant
-      end
-    end
-
-    private
-
-    def define_shapeable_helpers
-      SHAPEABLE_HELPER_METHODS.each do |method_name|
-        method_body = Shapeable::ControllerMethods.instance_method(method_name)
-        define_method(method_name, method_body)
       end
     end
 
