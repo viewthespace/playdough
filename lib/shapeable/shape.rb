@@ -61,7 +61,7 @@ module Shapeable
     end
 
     def infer_resource_name(path)
-      path.name.split('::').last
+      path.name.split('::').last.constantize
     end
   end
 end
