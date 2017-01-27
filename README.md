@@ -108,3 +108,4 @@ Will be constructed as `Serializers::Foo::V1::FooSerializer`.
 
 * Shapeable infers the resource name from the path. Specifically it expects that the last constant in the path is the resource. So in the case of `acts_as_shapeable(path: Serializers::Foo)` Shapeable assumes that the resource is `Foo`.
 * If we want a shape of `FooSerializer` we must specify a default_shape of `''` (empty string).
+* When making many request to the same url but with different shapes, webkit based browsers (ie safari) will cache the requests and return only the first response. The way around this is to user the "Vary" header pointing to your shape name on your request.
