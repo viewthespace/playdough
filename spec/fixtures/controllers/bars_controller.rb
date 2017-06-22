@@ -4,10 +4,6 @@ class BarsController < ActionController::Base
   acts_as_shapeable(path: Serializers::Bar)
 
   def show
-    render json: Bar.new(first_name: 'Shawn'), serializer: shape
-  end
-
-  def index
-    render json: Bar.new(first_name: 'Shawn'), serializer: shape
+    render json: shape.new(Bar.new(first_name: 'Shawn'))
   end
 end
