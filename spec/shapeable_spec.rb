@@ -46,6 +46,12 @@ describe FoosController, type: :controller do
       expect(JSON.parse(response.body)['foo_bar_baz']['first_name']).to eq('Shawn v1 bar baz')
     end
 
+    describe 'when no accept header is sent' do
+      it 'uses the default options' do
+        get :show, params: { id: 1 }
+        expect(JSON.parse(response.body)['first_name']).to eq('Shawn v1 default')
+      end
+    end
   end
 
   describe '#show without versioning or shape enforced' do

@@ -4,46 +4,74 @@ module Shapeable
 
     def self.included base
       base.class_eval do
-        def shape(shape_opts = {})
-          return unless request.accept
+        def shape(default_shape_opts = {})
           opts = merge_shapeable_options(
-            Shapeable.configuration.as_json, acts_as_shapeable_opts, shape_opts
+            Shapeable.configuration.as_json,
+            acts_as_shapeable_opts,
+            default_shape_opts,
+            request_shape_options(request)
           )
-          normalize_shapeable_options(opts)
-          raise ArgumentError, 'Specify a path' unless opts[:path]
-          shape = resolve_shape(request.accept, opts[:default_shape])
-          if opts[:enforce_versioning]
-            version = resolve_version(request.accept, opts[:default_version])
-            raise Shapeable::Errors::UnresolvedShapeError unless version && shape if opts[:enforce_shape]
-            constant = construct_constant(opts[:path], shape: shape, version: version)
-          else
-            raise Shapeable::Errors::UnresolvedShapeError unless shape if opts[:enforce_shape]
-            constant = construct_constant(opts[:path], shape: shape)
-          end
-          constant
+          normalize_shapeable_options!(opts)
+          validate_and_resolve_shape(opts)
         end
       end
     end
 
-    def normalize_shapeable_options(opts)
-      opts.keep_if do |k, _v|
-        [:path, :default_shape, :default_version, :enforce_versioning, :enforce_shape].include?(k)
-      end
-    end
-
-    def merge_shapeable_options(*opts_array)
-      opts_array.each_with_object({}) do |val, obj|
+    def merge_shapeable_options(*opts)
+      opts.each_with_object({}) do |val, obj|
         obj.merge!(val)
       end
     end
 
-    def resolve_version(accept_header, default)
-      version_str = accept_header[/version\s?=\s?(\d+)/, 1]
-      version_str.nil? ? default : version_str.to_i
+    def normalize_shapeable_options!(opts)
+      opts.keep_if do |k, _|
+        [
+          :path,
+          :default_shape,
+          :default_version,
+          :shape,
+          :version,
+          :enforce_versioning,
+          :enforce_shape
+        ].include?(k)
+      end
     end
 
-    def resolve_shape(accept_header, default)
-      accept_header[/shape\s?=\s?(\w+)/, 1] || default
+    def validate_and_resolve_shape(opts)
+      version = opts[:default_version] || opts[:version]
+      shape = opts[:default_shape] || opts[:shape]
+
+      if opts[:path].blank?
+        raise Shapeable::Errors::UnresolvedPathError
+      elsif opts[:enforce_versioning] && version.blank?
+        raise Shapeable::Errors::UnresolvedVersionError
+      elsif opts[:enforce_shape] && shape.blank?
+        raise Shapeable::Errors::UnresolvedShapeError
+      end
+
+      if opts[:enforce_versioning]
+        construct_constant(opts[:path], shape: shape, version: version)
+      else
+        construct_constant(opts[:path], shape: shape)
+      end
+    end
+
+    def request_shape_options(request)
+      {
+        version: resolve_version(request.accept),
+        shape: resolve_shape(request.accept)
+      }.delete_if { |_, v| v.blank? }
+    end
+
+    def resolve_version(accept_header)
+      if accept_header
+        version_str = accept_header[/version\s?=\s?(\d+)/, 1]
+        version_str.nil? ? nil : version_str.to_i
+      end
+    end
+
+    def resolve_shape(accept_header)
+      accept_header[/shape\s?=\s?(\w+)/, 1] if accept_header
     end
 
     def construct_constant(path, shape: nil, version: nil)

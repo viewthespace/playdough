@@ -12,9 +12,19 @@ module Shapeable
     end
 
     class UnresolvedShapeError < Exception
-      def initialize(msg = 'Unable to resolve shape.' \
-                     ' Try specifying a default version and shape.'
-                    )
+      def initialize(msg = 'Unable to resolve shape. Try specifying a default shape.')
+        super
+      end
+    end
+
+    class UnresolvedVersionError < Exception
+      def initialize(msg = 'Unable to resolve version. Try specifying a default version.')
+        super
+      end
+    end
+
+    class UnresolvedPathError < Exception
+      def initialize(msg = 'Unable to resolve path. Try specifying a path.')
         super
       end
     end
