@@ -38,8 +38,8 @@ module Shapeable
     end
 
     def validate_and_resolve_shape(opts)
-      version = opts[:default_version] || opts[:version]
-      shape = opts[:default_shape] || opts[:shape]
+      version = opts[:version] || opts[:default_version]
+      shape = opts[:shape] || opts[:default_shape]
 
       if opts[:path].blank?
         raise Shapeable::Errors::UnresolvedPathError
