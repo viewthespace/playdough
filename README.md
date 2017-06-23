@@ -39,37 +39,59 @@ Inside our controller we can reference the `shape` method, which returns the ser
 
 Now say we have several clients, each expecting a different serialized response.
 
+---
+
 A client on v1 would like a list of `foos` in short form:
-`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=1 shape=short'`
+
+`curl http://localhost:3000/foos -H 'Accept: application/json; version=1 shape=short'`
+
+OR
+
+`curl http://localhost:3000/foos?version=1&shape=short`
 
 When we reference `shape` inside the controller, it returns the following constant: `Serializers::Foo::V1::FooShortSerializer`
 
+---
 
 A client on v2 would like a list of `foos` in short form:
-`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=2 shape=short'`
+
+`curl http://localhost:3000/foos -H 'Accept: application/json; version=2 shape=short'`
+
+OR
+
+`curl http://localhost:3000/foos?version=2&shape=short`
 
 When we reference `shape` inside the controller, it returns the following constant: `Serializers::Foo::V2::FooShortSerializer`
 
+---
 
 A client on v1 would like a list of `foos` in full form:
-`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=1 shape=full'`
+
+`curl http://localhost:3000/foos -H 'Accept: application/json; version=1 shape=full'`
+
+OR
+
+`curl http://localhost:3000/foos?version=1&shape=full`
 
 When we reference `shape` inside the controller, it returns the following constant: `Serializers::Foo::V1::FooFullSerializer`
 
+---
+
+Note: headers take precedence over query parameters if both are sent
 
 ## Configuring Defaults
 
 Both `acts_as_shapeable` and `shape` accept the following arguments:
 
-* `default_version`: The default version in cases where the header is not specified.
+* `default_version`: The default version in cases where the version is not specified.
 * `default_shape`: The deafault shape in cases where the shape is not specified.
 
 The options defined on `shape` have greater precedence over those defined on `acts_as_shapeable`.
 
-In cases where the version and/or the shape is not specified in the Accept Header Shapeable will instead use the provided defaults. If no default is provided, and nothing is specified in the header, Shapeable will raise an `UnresolvedShapeError`.
+In cases where the version and/or the shape is not specified in the Accept Header Shapeable will instead use the provided defaults. If no default is provided, and nothing is specified in the header or query params, Shapeable will raise an `UnresolvedShapeError`.
 
 Using the same example controller and directory structure from above, a client sends no headers:
-`curl http://localhost:3000/foos -H 'Accept: application/javascript;`
+`curl http://localhost:3000/foos -H 'Accept: application/json;`
 Shapeable uses the defaults provided, and resolves `shape` to the following constant: `Serializers::Foo::V1::FooShortSerializer`
 
 
@@ -94,13 +116,13 @@ There are a few additional options which allow you to decide whether you want to
 
 When `enforce_versioning` is set to false, version will be ignored, and the version module will not be prepended. So the following request
 
-`curl http://localhost:3000/foos -H 'Accept: application/javascript; shape=default'`
+`curl http://localhost:3000/foos -H 'Accept: application/json; shape=default'`
 
 Will be constructed as `Serializers::Foo::FooDefaultSerializer` without the version module prepended.
 
 When `enforce_shape` is set to false, shape will be optional. When shape is not specified, the constant will be constructed with no shape. So the following request:
 
-`curl http://localhost:3000/foos -H 'Accept: application/javascript; version=1'`
+`curl http://localhost:3000/foos -H 'Accept: application/json; version=1'`
 
 Will be constructed as `Serializers::Foo::V1::FooSerializer`.
 

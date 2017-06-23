@@ -57,21 +57,27 @@ module Shapeable
     end
 
     def request_shape_options(request)
+      # Give precedence to headers
       {
-        version: resolve_version(request.accept),
-        shape: resolve_shape(request.accept)
+        version: resolve_header_version(request.accept) || resolve_params_version(request.params),
+        shape: resolve_header_shape(request.accept) || resolve_params_shape(request.params)
       }.delete_if { |_, v| v.blank? }
     end
 
-    def resolve_version(accept_header)
-      if accept_header
-        version_str = accept_header[/version\s?=\s?(\d+)/, 1]
-        version_str.nil? ? nil : version_str.to_i
-      end
+    def resolve_header_version(accept_header)
+      accept_header[/version\s?=\s?(\d+)/, 1] if accept_header
     end
 
-    def resolve_shape(accept_header)
+    def resolve_header_shape(accept_header)
       accept_header[/shape\s?=\s?(\w+)/, 1] if accept_header
+    end
+
+    def resolve_params_version(params)
+      params[:version]
+    end
+
+    def resolve_params_shape(params)
+      params[:shape]
     end
 
     def construct_constant(path, shape: nil, version: nil)
