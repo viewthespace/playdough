@@ -2,19 +2,19 @@ require_relative 'errors'
 module Shapeable
   module Shape
 
-    def self.included base
-      base.class_eval do
-        def shape(default_shape_opts = {})
-          opts = merge_shapeable_options(
-            Shapeable.configuration.as_json,
-            acts_as_shapeable_opts,
-            default_shape_opts,
-            request_shape_options(request)
-          )
-          normalize_shapeable_options!(opts)
-          validate_and_resolve_shape(opts)
-        end
-      end
+    def self.included(klass)
+      klass.extend Shapeable::Extenders
+    end
+
+    def shape(default_shape_opts = {})
+      opts = merge_shapeable_options(
+        Shapeable.configuration.as_json,
+        acts_as_shapeable_opts,
+        default_shape_opts,
+        request_shape_options(request)
+      )
+      normalize_shapeable_options!(opts)
+      validate_and_resolve_shape(opts)
     end
 
     def merge_shapeable_options(*opts)
