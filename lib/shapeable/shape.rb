@@ -82,13 +82,14 @@ module Shapeable
 
     def construct_constant(path, shape: nil, version: nil)
       resource = infer_resource_name(path)
-      if shape
-        return path.const_get("#{resource}#{shape.camelize}Serializer") unless version
-        path_with_version = path.const_get("V#{version}")
-        return path_with_version.const_get("#{resource}#{shape.camelize}Serializer")
+      if shape && version
+        path.const_get("V#{version}::#{resource}#{shape.camelize}Serializer")
+      elsif shape
+        path.const_get("#{resource}#{shape.camelize}Serializer")
+      elsif version
+        path.const_get("V#{version}::#{resource}Serializer")
       else
-        return path.const_get("#{resource}Serializer") unless version
-        return path_with_version.const_get("#{resource}Serializer")
+        path.const_get("#{resource}Serializer")
       end
     rescue NameError
       raise Shapeable::Errors::InvalidShapeError.new(path, shape, version: version)

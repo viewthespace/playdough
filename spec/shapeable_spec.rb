@@ -76,24 +76,39 @@ describe FoosController, type: :controller do
         expect(JSON.parse(response.body)['first_name']).to eq('Shawn v1 bar baz')
       end
     end
-  end
 
-  describe '#show without versioning or shape enforced' do
-    before do
-      Shapeable.configuration_data.enforce_versioning = false
-      Shapeable.configuration_data.enforce_shape = false
-      Shapeable.configuration_data.default_shape = nil
+    describe 'without versioning or shape enforced' do
+      before do
+        Shapeable.configuration_data.enforce_versioning = false
+        Shapeable.configuration_data.enforce_shape = false
+        Shapeable.configuration_data.default_shape = nil
+      end
+
+      it 'uses the foo full serializer when shape is specified' do
+        request.env['HTTP_ACCEPT'] = 'application/json; shape=full'
+        get :show, params: { id: 1 }
+        expect(JSON.parse(response.body)['first_name']).to eq('Shawn full')
+      end
+
+      it 'uses the foo (default) serializer when nothing is specified' do
+        request.env['HTTP_ACCEPT'] = 'application/json;'
+        get :show, params: { id: 1 }
+        expect(JSON.parse(response.body)['first_name']).to eq('Shawn')
+      end
     end
 
-    it 'ignores version and uses the foo full serializer' do
-      request.env['HTTP_ACCEPT'] = 'application/json; shape=full version=1'
-      get :show, params: { id: 1 }
-      expect(JSON.parse(response.body)['first_name']).to eq('Shawn full')
-    end
+    describe 'with version only' do
+      before do
+        Shapeable.configuration_data.default_version = 1
+        Shapeable.configuration_data.enforce_shape = false
+        Shapeable.configuration_data.enforce_versioning = true
+        Shapeable.configuration_data.default_shape = nil
+        get :show, params: { id: 1 }
+      end
 
-    it 'uses the foo serializer' do
-      get :show, params: { id: 1 }
-      expect(JSON.parse(response.body)['first_name']).to eq('Shawn')
+      it 'uses the v1 foo serializer' do
+        expect(JSON.parse(response.body)['first_name']).to eq('V1 Shawn')
+      end
     end
   end
 end
