@@ -11,7 +11,11 @@ module Shapeable
         Shapeable.configuration.as_json,
         acts_as_shapeable_opts,
         default_shape_opts,
-        request_shape_options(request)
+        request_shape_options(
+          request,
+          Shapeable.configuration.as_json[:shape_attr_override] || 'shape',
+          Shapeable.configuration.as_json[:version_attr_override] || 'version',
+        )
       )
       normalize_shapeable_options!(opts)
       validate_and_resolve_shape(opts)
@@ -56,28 +60,30 @@ module Shapeable
       end
     end
 
-    def request_shape_options(request)
-      # Give precedence to headers
+    def request_shape_options(request, shape_attr_name, version_attr_name)
       {
-        version: resolve_header_version(request.accept) || resolve_params_version(request.params),
-        shape: resolve_header_shape(request.accept) || resolve_params_shape(request.params)
+        version: resolve_header_version(request.accept, version_attr_name) || resolve_params_version(request.params, version_attr_name),
+        shape: resolve_header_shape(request.accept, shape_attr_name) || resolve_params_shape(request.params, shape_attr_name)
       }.delete_if { |_, v| v.blank? }
     end
 
-    def resolve_header_version(accept_header)
-      accept_header[/version\s?=\s?(\d+)/, 1] if accept_header
+    def resolve_header_version(accept_header, version_attr_name)
+      if accept_header
+        version_str = accept_header[/#{version_attr_name}\s?=\s?(\d+)/, 1]
+        version_str.nil? ? nil : version_str.to_i
+      end
     end
 
-    def resolve_header_shape(accept_header)
-      accept_header[/shape\s?=\s?(\w+)/, 1] if accept_header
+    def resolve_header_shape(accept_header, shape_attr_name)
+      accept_header[/#{shape_attr_name}\s?=\s?(\w+)/, 1] if accept_header
     end
 
-    def resolve_params_version(params)
-      params[:version]
+    def resolve_params_version(params, version_attr_name)
+      params[version_attr_name]
     end
 
-    def resolve_params_shape(params)
-      params[:shape]
+    def resolve_params_shape(params, shape_attr_name)
+      params[shape_attr_name]
     end
 
     def construct_constant(path, shape: nil, version: nil)

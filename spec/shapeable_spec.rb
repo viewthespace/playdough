@@ -110,5 +110,32 @@ describe FoosController, type: :controller do
         expect(JSON.parse(response.body)['first_name']).to eq('V1 Shawn')
       end
     end
+
+    describe 'overriding attrs' do
+      before do
+        Shapeable.configuration.default_version = 1
+        Shapeable.configuration.default_shape = 'default'
+        Shapeable.configuration.path = Serializers::Bar
+        Shapeable.configuration.enforce_shape = true
+        Shapeable.configuration.enforce_versioning = true
+        Shapeable.configuration.shape_attr_override = 'shape_attr'
+        Shapeable.configuration.version_attr_override = 'version_attr'
+      end
+
+      describe 'when using headers' do
+        it 'uses the v1 foo full serializer' do
+          request.env['HTTP_ACCEPT'] = 'application/json; version_attr=1 shape_attr=full'
+          get :show, params: { id: 1 }
+          expect(JSON.parse(response.body)['first_name']).to eq('Shawn v1 full')
+        end
+      end
+
+      describe 'when using query params' do
+        it 'uses the v1 foo full serializer' do
+          get :show, params: { id: 1, version_attr: 1, shape_attr: 'full' }
+          expect(JSON.parse(response.body)['first_name']).to eq('Shawn v1 full')
+        end
+      end
+    end
   end
 end
