@@ -30,8 +30,4 @@ module Shapeable
   end
 end
 
-if defined? ActionController::Base
-  ActionController::Base.class_eval do
-    extend Shapeable::Extenders
-  end
-end
+ActionController::Base.include Shapeable::Shape if defined? ActionController::Base
