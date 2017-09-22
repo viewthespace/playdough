@@ -137,5 +137,17 @@ describe FoosController, type: :controller do
         end
       end
     end
+
+    describe 'when default shape is a blank string with no version' do
+      before do
+        Shapeable.configuration.default_shape = ''
+        Shapeable.configuration.enforce_versioning = false
+      end
+
+      it 'uses the foo serializer' do
+        get :show, params: { id: 1 }
+        expect(JSON.parse(response.body)['first_name']).to eq('Shawn')
+      end
+    end
   end
 end

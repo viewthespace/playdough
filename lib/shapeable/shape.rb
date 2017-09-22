@@ -49,7 +49,7 @@ module Shapeable
         raise Shapeable::Errors::UnresolvedPathError
       elsif opts[:enforce_versioning] && version.blank?
         raise Shapeable::Errors::UnresolvedVersionError
-      elsif opts[:enforce_shape] && shape.blank?
+      elsif opts[:enforce_shape] && shape.nil?
         raise Shapeable::Errors::UnresolvedShapeError
       end
 
