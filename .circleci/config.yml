@@ -1,0 +1,49 @@
+version: 2
+jobs:
+  build:
+    parallelism: 1
+    docker:
+      - image: circleci/ruby:2.5.3-node-browsers
+        environment:
+          RAILS_ENV: test
+          RACK_ENV: test
+    steps:
+      - restore_cache:
+          keys:
+            - source-v1-{{ .Branch }}-{{ .Revision }}
+            - source-v1-{{ .Branch }}-
+            - source-v1-
+
+      - checkout
+
+      - save_cache:
+          key: source-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".git"
+
+      - restore_cache:
+          keys:
+          - dependencies-{{ checksum "shapeable.gemspec" }}-{{ checksum ".circleci/config.yml" }}
+          - dependencies-
+
+      - run:
+          name: install gem dependencies
+          command: |
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: dependencies-{{ checksum "shapeable.gemspec" }}-{{ checksum ".circleci/config.yml" }}
+
+      - run:
+          name: Run rspec
+          command: |
+            bundle exec rspec
+
+workflows:
+  version: 2
+
+  commit:
+    jobs:
+      - build
